@@ -1,0 +1,28 @@
+resources:
+- name: flight-school
+  type: git
+  source:
+    uri: https://github.com/cbusch-pivotal/flight-school.git
+    branch: master
+
+- name: staging-app
+  type: cf
+  source:
+    api: http://api.pcf1.fe.gopivotal.com
+    username: {{cf-user}}
+    password: {{cf-password}}
+    organization: {{cf-org}}
+    space: development {{cf-space}}
+    skip_cert_check: true
+
+jobs:
+- name: test-app
+  plan:
+  - get: flight-school
+    trigger: true
+  - task: tests
+    file: flight-school/build.yml
+  - put: staging-app
+    params:
+      manifest: flight-school/manifest.yml
+
